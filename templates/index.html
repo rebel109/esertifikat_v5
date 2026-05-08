@@ -1,0 +1,815 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% set site_bg    = get_setting('background') %}
+{% set site_title = get_setting('site_title', 'UIN Raden Fatah Palembang') %}
+{% set site_sub   = get_setting('site_subtitle', 'Portal resmi sertifikat akreditasi program studi — Badan Akreditasi Nasional Perguruan Tinggi') %}
+
+<!-- HERO -->
+<section class="hero" {% if site_bg %}style="background:linear-gradient(rgba(13,27,42,0.60),rgba(13,27,42,0.60)),url('/static/settings/{{ site_bg }}') center/cover no-repeat"{% endif %}>
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <i class="fas fa-certificate"></i>
+      Sistem Informasi Akreditasi
+    </div>
+    <h1>E-Sertifikat Akreditasi<br><span>{{ site_title }}</span></h1>
+    <p class="hero-sub">{{ site_sub }}</p>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num" id="statProdi">{{ data|length }}</div>
+        <div class="stat-label">Program Studi</div>
+      </div>
+      <div class="stat">
+        {% set ns = namespace(fak=[]) %}
+        {% for row in data %}
+          {% if row.fakultas and row.fakultas not in ns.fak %}
+            {% set ns.fak = ns.fak + [row.fakultas] %}
+          {% endif %}
+        {% endfor %}
+        <div class="stat-num">{{ ns.fak | length }}</div>
+        <div class="stat-label">Fakultas</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="statAktif">–</div>
+        <div class="stat-label">Sertifikat Aktif</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<!-- MAIN TABLE -->
+<div class="main">
+
+  <div class="section-header">
+    <div>
+      <div class="section-title">Daftar Program Studi & Akreditasi</div>
+    </div>
+    <div class="search-wrap">
+      <div class="search-wrap-inner">
+        <i class="fas fa-search"></i>
+        <input type="text" class="search-input" id="searchInput" placeholder="Cari program studi...">
+      </div>
+      <select class="filter-select" id="filterFakultas">
+        <option value="">Semua Fakultas</option>
+        {% set fakultas_list = [] %}
+        {% for row in data %}
+          {% if row.fakultas not in fakultas_list %}
+            {% set _ = fakultas_list.append(row.fakultas) %}
+          {% endif %}
+        {% endfor %}
+        {% for f in fakultas_list %}
+        <option value="{{ f }}">{{ f }}</option>
+        {% endfor %}
+      </select>
+      <select class="filter-select" id="filterJenjang">
+        <option value="">Semua Jenjang</option>
+        <option value="S1">S1</option>
+        <option value="S2">S2</option>
+        <option value="S3">S3</option>
+        <option value="D3">D3</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- AKREDITASI SECTIONS -->
+  <div class="akreditasi-sections">
+
+    <!-- UNGGUL -->
+    {% set unggul_data = data | selectattr('akreditasi', 'equalto', 'Unggul') | list %}
+    {% if unggul_data %}
+    <div class="akreditasi-section">
+      <div class="section-header">
+        <div class="section-title akreditasi-title akr-unggul">
+          <i class="fas fa-star"></i> Akreditasi Unggul
+        </div>
+        <div class="section-count">{{ unggul_data|length }} Program Studi</div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table class="akreditasi-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Program Studi</th>
+                <th>Fakultas</th>
+                <th>Jenjang</th>
+                <th>Tgl Terbit</th>
+                <th>Tgl Berakhir</th>
+                <th style="text-align:center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in unggul_data %}
+              <tr data-prodi="{{ row.nama.lower() }}" data-fakultas="{{ row.fakultas }}" data-jenjang="{{ row.jenjang }}">
+                <td class="td-no">{{ loop.index }}</td>
+                <td><div class="td-prodi">{{ row.nama }}</div></td>
+                <td><div class="td-fakultas">{{ row.fakultas }}</div></td>
+                <td>
+                  {% if row.jenjang == 'S1' %}
+                  <span class="badge-jenjang badge-s1">S1</span>
+                  {% elif row.jenjang == 'S2' %}
+                  <span class="badge-jenjang badge-s2">S2</span>
+                  {% elif row.jenjang == 'S3' %}
+                  <span class="badge-jenjang badge-s3">S3</span>
+                  {% else %}
+                  <span class="badge-jenjang badge-d3">{{ row.jenjang }}</span>
+                  {% endif %}
+                </td>
+                <td class="td-date">
+                  {% if row.tgl_terbit %}
+                  <i class="fas fa-calendar-alt" style="color:var(--gold);margin-right:4px;font-size:11px"></i>
+                  {{ row.tgl_terbit }}
+                  {% else %}—{% endif %}
+                </td>
+                <td class="td-date" id="tgl-{{ row.id }}">
+                  {% if row.tgl_berakhir %}
+                  {{ row.tgl_berakhir }}
+                  {% else %}—{% endif %}
+                </td>
+                <td>
+                  <div class="action-buttons" style="justify-content:center">
+                    <button class="btn btn-outline btn-sm" onclick="lihatSertifikat({{ row.id }}, '{{ row.nama }}')">
+                      <i class="fas fa-eye"></i> Lihat
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- BAIK SEKALI -->
+    {% set baik_sekali_data = data | selectattr('akreditasi', 'equalto', 'Baik Sekali') | list %}
+    {% if baik_sekali_data %}
+    <div class="akreditasi-section">
+      <div class="section-header">
+        <div class="section-title akreditasi-title akr-baik-sekali">
+          <i class="fas fa-trophy"></i> Akreditasi Baik Sekali
+        </div>
+        <div class="section-count">{{ baik_sekali_data|length }} Program Studi</div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table class="akreditasi-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Program Studi</th>
+                <th>Fakultas</th>
+                <th>Jenjang</th>
+                <th>Tgl Terbit</th>
+                <th>Tgl Berakhir</th>
+                <th style="text-align:center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in baik_sekali_data %}
+              <tr data-prodi="{{ row.nama.lower() }}" data-fakultas="{{ row.fakultas }}" data-jenjang="{{ row.jenjang }}">
+                <td class="td-no">{{ loop.index }}</td>
+                <td><div class="td-prodi">{{ row.nama }}</div></td>
+                <td><div class="td-fakultas">{{ row.fakultas }}</div></td>
+                <td>
+                  {% if row.jenjang == 'S1' %}
+                  <span class="badge-jenjang badge-s1">S1</span>
+                  {% elif row.jenjang == 'S2' %}
+                  <span class="badge-jenjang badge-s2">S2</span>
+                  {% elif row.jenjang == 'S3' %}
+                  <span class="badge-jenjang badge-s3">S3</span>
+                  {% else %}
+                  <span class="badge-jenjang badge-d3">{{ row.jenjang }}</span>
+                  {% endif %}
+                </td>
+                <td class="td-date">
+                  {% if row.tgl_terbit %}
+                  <i class="fas fa-calendar-alt" style="color:var(--gold);margin-right:4px;font-size:11px"></i>
+                  {{ row.tgl_terbit }}
+                  {% else %}—{% endif %}
+                </td>
+                <td class="td-date" id="tgl-{{ row.id }}">
+                  {% if row.tgl_berakhir %}
+                  {{ row.tgl_berakhir }}
+                  {% else %}—{% endif %}
+                </td>
+                <td>
+                  <div class="action-buttons" style="justify-content:center">
+                    <button class="btn btn-outline btn-sm" onclick="lihatSertifikat({{ row.id }}, '{{ row.nama }}')">
+                      <i class="fas fa-eye"></i> Lihat
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- BAIK -->
+    {% set baik_data = data | selectattr('akreditasi', 'equalto', 'Baik') | list %}
+    {% if baik_data %}
+    <div class="akreditasi-section">
+      <div class="section-header">
+        <div class="section-title akreditasi-title akr-baik">
+          <i class="fas fa-medal"></i> Akreditasi Baik
+        </div>
+        <div class="section-count">{{ baik_data|length }} Program Studi</div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table class="akreditasi-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Program Studi</th>
+                <th>Fakultas</th>
+                <th>Jenjang</th>
+                <th>Tgl Terbit</th>
+                <th>Tgl Berakhir</th>
+                <th style="text-align:center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in baik_data %}
+              <tr data-prodi="{{ row.nama.lower() }}" data-fakultas="{{ row.fakultas }}" data-jenjang="{{ row.jenjang }}">
+                <td class="td-no">{{ loop.index }}</td>
+                <td><div class="td-prodi">{{ row.nama }}</div></td>
+                <td><div class="td-fakultas">{{ row.fakultas }}</div></td>
+                <td>
+                  {% if row.jenjang == 'S1' %}
+                  <span class="badge-jenjang badge-s1">S1</span>
+                  {% elif row.jenjang == 'S2' %}
+                  <span class="badge-jenjang badge-s2">S2</span>
+                  {% elif row.jenjang == 'S3' %}
+                  <span class="badge-jenjang badge-s3">S3</span>
+                  {% else %}
+                  <span class="badge-jenjang badge-d3">{{ row.jenjang }}</span>
+                  {% endif %}
+                </td>
+                <td class="td-date">
+                  {% if row.tgl_terbit %}
+                  <i class="fas fa-calendar-alt" style="color:var(--gold);margin-right:4px;font-size:11px"></i>
+                  {{ row.tgl_terbit }}
+                  {% else %}—{% endif %}
+                </td>
+                <td class="td-date" id="tgl-{{ row.id }}">
+                  {% if row.tgl_berakhir %}
+                  {{ row.tgl_berakhir }}
+                  {% else %}—{% endif %}
+                </td>
+                <td>
+                  <div class="action-buttons" style="justify-content:center">
+                    <button class="btn btn-outline btn-sm" onclick="lihatSertifikat({{ row.id }}, '{{ row.nama }}')">
+                      <i class="fas fa-eye"></i> Lihat
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- AKREDITASI A -->
+    {% set akreditasi_a_data = data | selectattr('akreditasi', 'equalto', 'A') | list %}
+    {% if akreditasi_a_data %}
+    <div class="akreditasi-section">
+      <div class="section-header">
+        <div class="section-title akreditasi-title akr-a">
+          <i class="fas fa-award"></i> Akreditasi A
+        </div>
+        <div class="section-count">{{ akreditasi_a_data|length }} Program Studi</div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table class="akreditasi-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Program Studi</th>
+                <th>Fakultas</th>
+                <th>Jenjang</th>
+                <th>Tgl Terbit</th>
+                <th>Tgl Berakhir</th>
+                <th style="text-align:center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in akreditasi_a_data %}
+              <tr data-prodi="{{ row.nama.lower() }}" data-fakultas="{{ row.fakultas }}" data-jenjang="{{ row.jenjang }}">
+                <td class="td-no">{{ loop.index }}</td>
+                <td><div class="td-prodi">{{ row.nama }}</div></td>
+                <td><div class="td-fakultas">{{ row.fakultas }}</div></td>
+                <td>
+                  {% if row.jenjang == 'S1' %}
+                  <span class="badge-jenjang badge-s1">S1</span>
+                  {% elif row.jenjang == 'S2' %}
+                  <span class="badge-jenjang badge-s2">S2</span>
+                  {% elif row.jenjang == 'S3' %}
+                  <span class="badge-jenjang badge-s3">S3</span>
+                  {% else %}
+                  <span class="badge-jenjang badge-d3">{{ row.jenjang }}</span>
+                  {% endif %}
+                </td>
+                <td class="td-date">
+                  {% if row.tgl_terbit %}
+                  <i class="fas fa-calendar-alt" style="color:var(--gold);margin-right:4px;font-size:11px"></i>
+                  {{ row.tgl_terbit }}
+                  {% else %}—{% endif %}
+                </td>
+                <td class="td-date" id="tgl-{{ row.id }}">
+                  {% if row.tgl_berakhir %}
+                  {{ row.tgl_berakhir }}
+                  {% else %}—{% endif %}
+                </td>
+                <td>
+                  <div class="action-buttons" style="justify-content:center">
+                    <button class="btn btn-outline btn-sm" onclick="lihatSertifikat({{ row.id }}, '{{ row.nama }}')">
+                      <i class="fas fa-eye"></i> Lihat
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- AKREDITASI B -->
+    {% set akreditasi_b_data = data | selectattr('akreditasi', 'equalto', 'B') | list %}
+    {% if akreditasi_b_data %}
+    <div class="akreditasi-section">
+      <div class="section-header">
+        <div class="section-title akreditasi-title akr-b">
+          <i class="fas fa-certificate"></i> Akreditasi B
+        </div>
+        <div class="section-count">{{ akreditasi_b_data|length }} Program Studi</div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table class="akreditasi-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Program Studi</th>
+                <th>Fakultas</th>
+                <th>Jenjang</th>
+                <th>Tgl Terbit</th>
+                <th>Tgl Berakhir</th>
+                <th style="text-align:center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in akreditasi_b_data %}
+              <tr data-prodi="{{ row.nama.lower() }}" data-fakultas="{{ row.fakultas }}" data-jenjang="{{ row.jenjang }}">
+                <td class="td-no">{{ loop.index }}</td>
+                <td><div class="td-prodi">{{ row.nama }}</div></td>
+                <td><div class="td-fakultas">{{ row.fakultas }}</div></td>
+                <td>
+                  {% if row.jenjang == 'S1' %}
+                  <span class="badge-jenjang badge-s1">S1</span>
+                  {% elif row.jenjang == 'S2' %}
+                  <span class="badge-jenjang badge-s2">S2</span>
+                  {% elif row.jenjang == 'S3' %}
+                  <span class="badge-jenjang badge-s3">S3</span>
+                  {% else %}
+                  <span class="badge-jenjang badge-d3">{{ row.jenjang }}</span>
+                  {% endif %}
+                </td>
+                <td class="td-date">
+                  {% if row.tgl_terbit %}
+                  <i class="fas fa-calendar-alt" style="color:var(--gold);margin-right:4px;font-size:11px"></i>
+                  {{ row.tgl_terbit }}
+                  {% else %}—{% endif %}
+                </td>
+                <td class="td-date" id="tgl-{{ row.id }}">
+                  {% if row.tgl_berakhir %}
+                  {{ row.tgl_berakhir }}
+                  {% else %}—{% endif %}
+                </td>
+                <td>
+                  <div class="action-buttons" style="justify-content:center">
+                    <button class="btn btn-outline btn-sm" onclick="lihatSertifikat({{ row.id }}, '{{ row.nama }}')">
+                      <i class="fas fa-eye"></i> Lihat
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- AKREDITASI C -->
+    {% set akreditasi_c_data = data | selectattr('akreditasi', 'equalto', 'C') | list %}
+    {% if akreditasi_c_data %}
+    <div class="akreditasi-section">
+      <div class="section-header">
+        <div class="section-title akreditasi-title akr-c">
+          <i class="fas fa-exclamation-triangle"></i> Akreditasi C
+        </div>
+        <div class="section-count">{{ akreditasi_c_data|length }} Program Studi</div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table class="akreditasi-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Program Studi</th>
+                <th>Fakultas</th>
+                <th>Jenjang</th>
+                <th>Tgl Terbit</th>
+                <th>Tgl Berakhir</th>
+                <th style="text-align:center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in akreditasi_c_data %}
+              <tr data-prodi="{{ row.nama.lower() }}" data-fakultas="{{ row.fakultas }}" data-jenjang="{{ row.jenjang }}">
+                <td class="td-no">{{ loop.index }}</td>
+                <td><div class="td-prodi">{{ row.nama }}</div></td>
+                <td><div class="td-fakultas">{{ row.fakultas }}</div></td>
+                <td>
+                  {% if row.jenjang == 'S1' %}
+                  <span class="badge-jenjang badge-s1">S1</span>
+                  {% elif row.jenjang == 'S2' %}
+                  <span class="badge-jenjang badge-s2">S2</span>
+                  {% elif row.jenjang == 'S3' %}
+                  <span class="badge-jenjang badge-s3">S3</span>
+                  {% else %}
+                  <span class="badge-jenjang badge-d3">{{ row.jenjang }}</span>
+                  {% endif %}
+                </td>
+                <td class="td-date">
+                  {% if row.tgl_terbit %}
+                  <i class="fas fa-calendar-alt" style="color:var(--gold);margin-right:4px;font-size:11px"></i>
+                  {{ row.tgl_terbit }}
+                  {% else %}—{% endif %}
+                </td>
+                <td class="td-date" id="tgl-{{ row.id }}">
+                  {% if row.tgl_berakhir %}
+                  {{ row.tgl_berakhir }}
+                  {% else %}—{% endif %}
+                </td>
+                <td>
+                  <div class="action-buttons" style="justify-content:center">
+                    <button class="btn btn-outline btn-sm" onclick="lihatSertifikat({{ row.id }}, '{{ row.nama }}')">
+                      <i class="fas fa-eye"></i> Lihat
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+</div>
+
+<!-- MODAL: Daftar Sertifikat Per Prodi -->
+<div class="modal-overlay" id="modalSertifikat">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalProdiTitle">–</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px" id="modalProdiSub">Riwayat Sertifikat Akreditasi</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalSertifikat')">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body" id="modalSertifikatBody">
+      <div style="text-align:center;padding:32px;color:var(--muted)">
+        <i class="fas fa-spinner fa-spin" style="font-size:24px;margin-bottom:12px;display:block"></i>
+        Memuat data sertifikat...
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* AKREDITASI SECTIONS */
+.akreditasi-sections {
+  margin-bottom: 40px;
+}
+
+.akreditasi-section {
+  margin-bottom: 32px;
+}
+
+.akreditasi-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.akreditasi-title i {
+  font-size: 20px;
+}
+
+.akreditasi-title::after {
+  display: none;
+}
+
+.akr-unggul { color: #FFD700; }
+.akr-baik-sekali { color: #FF6B35; }
+.akr-baik { color: #4CAF50; }
+.akr-a { color: #2196F3; }
+.akr-b { color: #FF9800; }
+.akr-c { color: #F44336; }
+
+.section-count {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.badge-jenjang {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-s1 { background: rgba(33,150,243,0.1); color: #2196F3; }
+.badge-s2 { background: rgba(76,175,80,0.1); color: #4CAF50; }
+.badge-s3 { background: rgba(255,152,0,0.1); color: #FF9800; }
+.badge-d3 { background: rgba(156,39,176,0.1); color: #9C27B0; }
+.badge-d4 { background: rgba(244,67,54,0.1); color: #F44336; }
+
+  padding: 20px;
+  margin-bottom: 14px;
+  transition: all 0.2s;
+  background: white;
+}
+
+.sert-item:hover {
+  border-color: var(--gold);
+  box-shadow: 0 4px 20px rgba(200,168,75,0.12);
+}
+
+.sert-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sert-period {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.sert-meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.sert-meta-item label {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.sert-meta-item span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.sert-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.sert-status.aktif { background: #DCFCE7; color: #15803D; }
+.sert-status.expired { background: #FEE2E2; color: #B91C1C; }
+
+.info-banner {
+  background: linear-gradient(135deg, var(--navy), var(--deep));
+  border-radius: 14px;
+  padding: 24px 32px;
+  margin-bottom: 40px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.info-banner i { color: var(--gold-light); font-size: 24px; flex-shrink: 0; margin-top: 3px; }
+
+.info-banner h3 { font-family: 'Cinzel',serif; font-size: 15px; color: white; margin-bottom: 6px; }
+.info-banner p { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.6; }
+</style>
+
+<script>
+// Color expired dates
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().slice(0,10);
+  let aktif = 0;
+  document.querySelectorAll('[id^="tgl-"]').forEach(td => {
+    const date = td.textContent.trim();
+    if (date && date !== '—') {
+      if (date < today) {
+        td.classList.add('expired');
+        td.innerHTML = `<i class="fas fa-times-circle" style="color:#EF4444;margin-right:4px;font-size:11px"></i>${date}`;
+      } else {
+        td.classList.add('active');
+        td.innerHTML = `<i class="fas fa-check-circle" style="color:#22C55E;margin-right:4px;font-size:11px"></i>${date}`;
+        aktif++;
+      }
+    }
+  });
+  document.getElementById('statAktif').textContent = aktif;
+});
+
+// Search & filter
+function filterTable() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const fak = document.getElementById('filterFakultas').value;
+  const jen = document.getElementById('filterJenjang').value;
+  let totalShown = 0;
+
+  // Filter untuk setiap section akreditasi
+  document.querySelectorAll('.akreditasi-section').forEach(section => {
+    let sectionShown = 0;
+    const table = section.querySelector('.akreditasi-table');
+    if (table) {
+      const tbody = table.querySelector('tbody');
+      tbody.querySelectorAll('tr').forEach((tr, i) => {
+        const prodi = tr.dataset.prodi || '';
+        const fakultas = tr.dataset.fakultas || '';
+        const jenjang = tr.dataset.jenjang || '';
+        const match = prodi.includes(q) && (fak === '' || fakultas === fak) && (jen === '' || jenjang === jen);
+        tr.style.display = match ? '' : 'none';
+        if (match) {
+          sectionShown++;
+          tr.querySelector('.td-no').textContent = sectionShown;
+        }
+      });
+    }
+
+    // Update section count
+    const countElement = section.querySelector('.section-count');
+    if (countElement) {
+      countElement.textContent = `${sectionShown} Program Studi`;
+    }
+
+    // Hide section if no items shown
+    if (sectionShown === 0) {
+      section.style.display = 'none';
+    } else {
+      section.style.display = '';
+      totalShown += sectionShown;
+    }
+  });
+
+  document.getElementById('tableInfo').innerHTML = `Menampilkan <strong>${totalShown}</strong> program studi`;
+}
+
+document.getElementById('searchInput').addEventListener('input', filterTable);
+document.getElementById('filterFakultas').addEventListener('change', filterTable);
+document.getElementById('filterJenjang').addEventListener('change', filterTable);
+
+// Load sertifikat modal
+async function lihatSertifikat(prodiId, prodiNama) {
+  document.getElementById('modalProdiTitle').textContent = prodiNama;
+  document.getElementById('modalSertifikatBody').innerHTML = `
+    <div style="text-align:center;padding:32px;color:var(--muted)">
+      <i class="fas fa-spinner fa-spin" style="font-size:24px;margin-bottom:12px;display:block"></i>
+      Memuat data sertifikat...
+    </div>`;
+  openModal('modalSertifikat');
+
+  try {
+    const res = await fetch(`/api/sertifikat/${prodiId}`);
+    const data = await res.json();
+    const today = new Date().toISOString().slice(0,10);
+
+    if (data.length === 0) {
+      document.getElementById('modalSertifikatBody').innerHTML = `
+        <div class="empty-state"><i class="fas fa-folder-open"></i><h3>Belum ada sertifikat</h3><p>Data sertifikat untuk program studi ini belum tersedia.</p></div>`;
+      return;
+    }
+
+    let html = `<div style="margin-bottom:16px;font-size:13px;color:var(--muted)">
+      <i class="fas fa-history" style="margin-right:6px;color:var(--gold)"></i>
+      ${data.length} sertifikat ditemukan
+    </div>`;
+
+    data.reverse().forEach((s, i) => {
+      const aktif = s.tgl_berakhir >= today;
+      const statusHtml = aktif
+        ? `<span class="sert-status aktif"><i class="fas fa-check-circle"></i> Aktif</span>`
+        : `<span class="sert-status expired"><i class="fas fa-times-circle"></i> Kadaluarsa</span>`;
+
+      let akrClass = 'akr-b';
+      if (s.akreditasi === 'Unggul') akrClass = 'akr-unggul';
+      else if (s.akreditasi === 'A') akrClass = 'akr-a';
+      else if (s.akreditasi === 'C') akrClass = 'akr-c';
+
+      html += `
+      <div class="sert-item">
+        <div class="sert-header">
+          <span class="sert-period">
+            <i class="fas fa-certificate" style="color:var(--gold);margin-right:6px"></i>
+            Periode ${s.tgl_terbit.slice(0,4)} – ${s.tgl_berakhir.slice(0,4)}
+          </span>
+          <div style="display:flex;gap:8px;align-items:center">
+            ${statusHtml}
+            <span class="badge-akreditasi ${akrClass}" style="font-size:12px;padding:3px 12px">
+              ${s.akreditasi}
+            </span>
+          </div>
+        </div>
+        <div class="sert-meta">
+          <div class="sert-meta-item">
+            <label>Nomor SK</label>
+            <span>${s.nomor_sk || '—'}</span>
+          </div>
+          <div class="sert-meta-item">
+            <label>Tgl Terbit</label>
+            <span>${formatDate(s.tgl_terbit)}</span>
+          </div>
+          <div class="sert-meta-item">
+            <label>Berlaku Hingga</label>
+            <span style="color:${aktif ? '#16A34A' : '#DC2626'}">${formatDate(s.tgl_berakhir)}</span>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--cream-dark);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          ${s.has_file
+            ? `<span style="font-size:12px;color:#16A34A;display:flex;align-items:center;gap:5px;margin-right:4px">
+                <i class="fas fa-check-circle"></i> File asli tersedia
+               </span>
+               <a href="/download/${s.id}" target="_blank" class="btn btn-gold btn-sm">
+                 <i class="fas fa-download"></i> Download
+               </a>
+               <a href="/download/${s.id}" target="_blank" class="btn btn-outline btn-sm">
+                 <i class="fas fa-eye"></i> Pratinjau
+               </a>`
+            : `<span style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;margin-right:4px">
+                <i class="fas fa-info-circle"></i> Sertifikat otomatis
+               </span>
+               <a href="/download/${s.id}" target="_blank" class="btn btn-outline btn-sm">
+                 <i class="fas fa-eye"></i> Pratinjau Sertifikat
+               </a>`
+          }
+        </div>
+      </div>`;
+    });
+
+    document.getElementById('modalSertifikatBody').innerHTML = html;
+  } catch(e) {
+    document.getElementById('modalSertifikatBody').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Gagal memuat data</h3></div>`;
+  }
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  const [y,m,day] = d.split('-');
+  const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  return `${parseInt(day)} ${months[parseInt(m)-1]} ${y}`;
+}
+</script>
+
+{% endblock %}

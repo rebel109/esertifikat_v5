@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+.admin-navbar-extra {
+  background: linear-gradient(135deg, #0D4F3C, #0a3a2c);
+  padding: 10px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: none;
+}
+
+.admin-topbar {
+  background: linear-gradient(135deg, #0D4F3C 0%, #0D1B2A 100%);
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(200,168,75,0.2);
+}
+
+.admin-topbar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-title {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-title i { color: var(--gold); }
+
+.admin-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.admin-nav a {
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-nav a:hover, .admin-nav a.active {
+  background: rgba(200,168,75,0.15);
+  color: var(--gold-light);
+}
+
+.warning-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  border: 1px solid rgba(245,158,11,0.2);
+  margin-bottom: 20px;
+}
+
+.warning-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.warning-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(245,158,11,0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #F59E0B;
+  font-size: 20px;
+}
+
+.warning-title {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  color: var(--navy);
+  margin: 0;
+}
+
+.warning-subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 4px 0 0 0;
+}
+
+.table-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  border: 1px solid rgba(200,168,75,0.1);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  background: rgba(13,79,60,0.05);
+  padding: 16px 20px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy);
+  border-bottom: 1px solid rgba(200,168,75,0.1);
+}
+
+tbody td {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(200,168,75,0.05);
+  font-size: 14px;
+  color: var(--text);
+}
+
+tbody tr:hover {
+  background: rgba(200,168,75,0.02);
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  display: inline-block;
+}
+
+.status-warning {
+  background: rgba(245,158,11,0.1);
+  color: #F59E0B;
+}
+
+.status-expired {
+  background: rgba(220,38,38,0.1);
+  color: #DC2626;
+}
+
+.days-left {
+  font-weight: 600;
+  color: #F59E0B;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ADMIN TOPBAR -->
+<div class="admin-topbar">
+  <div class="admin-topbar-inner">
+    <div class="admin-title">
+      <i class="fas fa-exclamation-triangle"></i>
+      Peringatan Sertifikat
+    </div>
+    <div class="admin-nav">
+      <a href="/admin">
+        <i class="fas fa-home"></i> Dashboard
+      </a>
+      <a href="/admin/warnings" class="active">
+        <i class="fas fa-exclamation-triangle"></i> Peringatan
+      </a>
+      <a href="/admin/prodi">
+        <i class="fas fa-graduation-cap"></i> Program Studi
+      </a>
+      <a href="/admin/sertifikat">
+        <i class="fas fa-certificate"></i> Sertifikat
+      </a>
+      <a href="/admin/pengaturan"><i class="fas fa-cog"></i> Pengaturan</a>
+      <a href="/admin/logout" style="color:#FCA5A5">
+        <i class="fas fa-sign-out-alt"></i> Keluar
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- WARNING CARD -->
+  <div class="warning-card">
+    <div class="warning-header">
+      <div class="warning-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div>
+        <h2 class="warning-title">Peringatan Masa Berlaku Sertifikat</h2>
+        <p class="warning-subtitle">Program studi dengan sertifikat akreditasi yang akan berakhir dalam 1 tahun ke depan</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- WARNINGS TABLE -->
+  <div class="table-card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Program Studi</th>
+            <th>Fakultas</th>
+            <th>Jenjang</th>
+            <th>Akreditasi</th>
+            <th>Tgl Terbit</th>
+            <th>Tgl Berakhir</th>
+            <th>Hari Tersisa</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for w in warnings %}
+          <tr>
+            <td>{{ w.nama }}</td>
+            <td>{{ w.fakultas }}</td>
+            <td>{{ w.jenjang }}</td>
+            <td>{{ w.akreditasi }}</td>
+            <td>{{ w.tgl_terbit }}</td>
+            <td>{{ w.tgl_berakhir }}</td>
+            <td>
+              <span class="days-left">
+                {% if w.hari_tersisa > 0 %}
+                  {{ w.hari_tersisa }} hari
+                {% else %}
+                  Kadaluarsa
+                {% endif %}
+              </span>
+            </td>
+            <td>
+              {% if w.hari_tersisa > 30 %}
+                <span class="status-badge status-warning">Perlu Perhatian</span>
+              {% else %}
+                <span class="status-badge status-expired">Segera Perpanjang</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+          {% if not warnings %}
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 40px; color: var(--muted);">
+              <i class="fas fa-check-circle" style="font-size: 24px; color: #16A34A; margin-bottom: 8px;"></i><br>
+              Tidak ada sertifikat yang akan berakhir dalam 1 tahun ke depan.
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,422 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+.admin-topbar { background:linear-gradient(135deg,#0D4F3C 0%,#0D1B2A 100%); padding:12px 0; border-bottom:1px solid rgba(200,168,75,0.2); }
+.admin-topbar-inner { max-width:1280px; margin:0 auto; padding:0 32px; display:flex; align-items:center; justify-content:space-between; }
+.admin-title { font-family:'Cinzel',serif; font-size:13px; color:rgba(255,255,255,0.7); display:flex; align-items:center; gap:8px; }
+.admin-title i { color:var(--gold); }
+.admin-nav { display:flex; gap:4px; }
+.admin-nav a { color:rgba(255,255,255,0.65); text-decoration:none; padding:7px 16px; border-radius:6px; font-size:13px; font-weight:500; transition:all 0.2s; display:flex; align-items:center; gap:6px; }
+.admin-nav a:hover, .admin-nav a.active { background:rgba(200,168,75,0.15); color:var(--gold-light); }
+.sert-status { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:100px; font-size:11px; font-weight:600; }
+.sert-status.aktif { background:#DCFCE7; color:#15803D; }
+.sert-status.expired { background:#FEE2E2; color:#B91C1C; }
+
+/* Upload Zone */
+.upload-zone {
+  border: 2px dashed var(--cream-dark);
+  border-radius: 12px;
+  padding: 24px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--cream);
+}
+.upload-zone:hover, .upload-zone.dragover {
+  border-color: var(--gold);
+  background: rgba(200,168,75,0.05);
+}
+.upload-zone i { font-size: 28px; color: var(--gold); display:block; margin-bottom:8px; }
+.upload-zone p { font-size:14px; font-weight:500; color:var(--text); margin-bottom:4px; }
+.upload-zone span { font-size:12px; color:var(--muted); }
+.upload-preview { margin-top: 12px; }
+.upload-preview .file-chip {
+  display:inline-flex; align-items:center; gap:8px;
+  background:white; border:1px solid var(--cream-dark);
+  border-radius:8px; padding:8px 14px;
+  font-size:13px; color:var(--text); max-width:100%; word-break:break-all;
+}
+.upload-preview .file-chip i { color:#EF4444; flex-shrink:0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-topbar">
+  <div class="admin-topbar-inner">
+    <div class="admin-title"><i class="fas fa-certificate"></i> Manajemen Sertifikat</div>
+    <div class="admin-nav">
+      <a href="/admin"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="/admin/warnings" style="color:#F59E0B"><i class="fas fa-exclamation-triangle"></i> Peringatan</a>
+      <a href="/admin/prodi"><i class="fas fa-graduation-cap"></i> Program Studi</a>
+      <a href="/admin/sertifikat" class="active"><i class="fas fa-certificate"></i> Sertifikat</a>
+      <a href="/admin/pengaturan"><i class="fas fa-cog"></i> Pengaturan</a>
+      <a href="/admin/logout" style="color:#FCA5A5"><i class="fas fa-sign-out-alt"></i> Keluar</a>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Data Sertifikat Akreditasi</div>
+    </div>
+
+    {% if tambah_error %}
+    <div style="width:100%;margin-bottom:0">
+      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:12px 16px;font-size:13px;color:#B91C1C;display:flex;align-items:center;gap:8px">
+        <i class="fas fa-exclamation-circle"></i> {{ tambah_error }}
+      </div>
+    </div>
+    {% endif %}
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <div class="search-wrap-inner">
+        <i class="fas fa-search"></i>
+        <input type="text" class="search-input" id="searchInput" placeholder="Cari sertifikat...">
+      </div>
+      <button class="btn btn-gold" onclick="openModal('modalTambahSert')">
+        <i class="fas fa-plus"></i> Tambah Sertifikat
+      </button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Program Studi</th>
+            <th>Fakultas</th>
+            <th>Jenjang</th>
+            <th>Akreditasi</th>
+            <th>Tgl Terbit</th>
+            <th>Tgl Berakhir</th>
+            <th>Status</th>
+            <th>File</th>
+            <th style="text-align:center">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          {% set today_str = '' %}
+          {% for row in data %}
+          <tr data-search="{{ row.nama.lower() }} {{ row.fakultas.lower() }}">
+            <td class="td-no">{{ loop.index }}</td>
+            <td class="td-prodi">{{ row.nama }}</td>
+            <td class="td-fakultas">{{ row.fakultas }}</td>
+            <td><span class="badge-jenjang badge-{{ row.jenjang.lower() }}">{{ row.jenjang }}</span></td>
+            <td>
+              {% if row.akreditasi == 'Unggul' %}<span class="badge-akreditasi akr-unggul">Unggul</span>
+              {% elif row.akreditasi == 'A' %}<span class="badge-akreditasi akr-a">A</span>
+              {% elif row.akreditasi == 'B' %}<span class="badge-akreditasi akr-b">B</span>
+              {% elif row.akreditasi == 'C' %}<span class="badge-akreditasi akr-c">C</span>
+              {% else %}<span class="badge-akreditasi akr-baik">{{ row.akreditasi }}</span>{% endif %}
+            </td>
+            <td class="td-date">{{ row.tgl_terbit }}</td>
+            <td class="td-date">{{ row.tgl_berakhir }}</td>
+            <td id="status-{{ row.id }}">
+              <span class="sert-status" data-tgl="{{ row.tgl_berakhir }}">–</span>
+            </td>
+            <td>
+              {% if row.file_name %}
+              <a href="/file/{{ row.id }}" target="_blank" class="btn btn-success btn-sm">
+                <i class="fas fa-file-pdf"></i> Lihat
+              </a>
+              {% else %}
+              <span style="font-size:12px;color:#ccc"><i class="fas fa-minus"></i> Belum ada</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="action-buttons" style="justify-content:center">
+                <button class="btn btn-outline btn-sm"
+                  onclick="openEditSert({{ row.id }}, {{ row.prodi_id }}, '{{ row.akreditasi }}', '{{ row.tgl_terbit }}', '{{ row.tgl_berakhir }}', '{{ row.file_name or '' }}')">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="konfirmasiHapusSert({{ row.id }}, '{{ row.nama|replace("'", "\\'") }}')">
+                  <i class="fas fa-trash"></i>
+                </button>
+                <a href="/download/{{ row.id }}" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fas fa-download"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="table-footer">
+      <span>Total: <strong>{{ data|length }}</strong> sertifikat</span>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TAMBAH -->
+<div class="modal-overlay" id="modalTambahSert">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-plus-circle" style="color:var(--gold);margin-right:8px"></i>Tambah Sertifikat</div>
+      <button class="modal-close" onclick="closeModal('modalTambahSert')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <form method="POST" action="/admin/sertifikat/add" enctype="multipart/form-data">
+        <div class="form-group">
+          <label class="form-label">Program Studi</label>
+          <select name="prodi_id" class="form-control" required>
+            <option value="">— Pilih Program Studi —</option>
+            {% for p in prodi_list %}
+            <option value="{{ p.id }}">{{ p.nama }} ({{ p.jenjang }}) — {{ p.fakultas }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Peringkat Akreditasi</label>
+          <select name="akreditasi" class="form-control" required>
+            <option value="">— Pilih Akreditasi —</option>
+            <option value="Unggul">Unggul</option>
+            <option value="Baik Sekali">Baik Sekali</option>
+            <option value="Baik">Baik</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Tanggal Terbit</label>
+            <input type="date" name="tgl_terbit" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tanggal Berakhir</label>
+            <input type="date" name="tgl_berakhir" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            Upload File Sertifikat
+            <span style="color:#EF4444;font-weight:700"> *</span>
+            <small style="color:var(--muted);font-weight:400;margin-left:4px">(wajib diisi)</small>
+          </label>
+          <div class="upload-zone" id="uploadZoneTambah" onclick="document.getElementById('fileTambah').click()">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Klik untuk memilih file atau drag & drop di sini</p>
+            <span>PDF, JPG, PNG — Maks. 10 MB</span>
+            <div class="upload-preview" id="previewTambah"></div>
+          </div>
+          <input type="file" id="fileTambah" name="file_sertifikat" accept=".pdf,.jpg,.jpeg,.png"
+                 style="display:none" required
+                 onchange="previewFile(this, 'previewTambah', 'uploadZoneTambah')">
+          <div id="fileError" style="display:none;color:#EF4444;font-size:12px;margin-top:6px">
+            <i class="fas fa-exclamation-circle"></i> File sertifikat wajib diupload!
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalTambahSert')" style="flex:1">Batal</button>
+          <button type="submit" class="btn btn-gold" style="flex:2"><i class="fas fa-save"></i> Simpan Sertifikat</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDIT -->
+<div class="modal-overlay" id="modalEditSert">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-edit" style="color:var(--gold);margin-right:8px"></i>Edit Sertifikat</div>
+      <button class="modal-close" onclick="closeModal('modalEditSert')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <form method="POST" id="formEditSert" enctype="multipart/form-data">
+        <div class="form-group">
+          <label class="form-label">Program Studi</label>
+          <select name="prodi_id" id="editProdiId" class="form-control" required>
+            {% for p in prodi_list %}
+            <option value="{{ p.id }}">{{ p.nama }} ({{ p.jenjang }}) — {{ p.fakultas }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Peringkat Akreditasi</label>
+          <select name="akreditasi" id="editAkreditasi" class="form-control" required>
+            <option value="Unggul">Unggul</option>
+            <option value="Baik Sekali">Baik Sekali</option>
+            <option value="Baik">Baik</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Tanggal Terbit</label>
+            <input type="date" name="tgl_terbit" id="editTglTerbit" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tanggal Berakhir</label>
+            <input type="date" name="tgl_berakhir" id="editTglBerakhir" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Upload File Sertifikat</label>
+          <div id="editCurrentFile" style="display:none;margin-bottom:10px;padding:10px 14px;background:var(--cream);border-radius:8px;font-size:13px;display:flex;align-items:center;gap:8px;">
+            <i class="fas fa-file-pdf" style="color:#EF4444"></i>
+            <span id="editCurrentFileName">–</span>
+            <a id="editCurrentFileLink" href="#" target="_blank" class="btn btn-outline btn-sm" style="margin-left:auto">
+              <i class="fas fa-eye"></i> Lihat
+            </a>
+          </div>
+          <div class="upload-zone" id="uploadZoneEdit" onclick="document.getElementById('fileEdit').click()">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Klik untuk mengganti file atau drag & drop</p>
+            <span>PDF, JPG, PNG — Maks. 10 MB (kosongkan jika tidak ingin mengganti)</span>
+            <div class="upload-preview" id="previewEdit"></div>
+          </div>
+          <input type="file" id="fileEdit" name="file_sertifikat" accept=".pdf,.jpg,.jpeg,.png"
+                 style="display:none" onchange="previewFile(this, 'previewEdit', 'uploadZoneEdit')">
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalEditSert')" style="flex:1">Batal</button>
+          <button type="submit" class="btn btn-gold" style="flex:2"><i class="fas fa-save"></i> Update Sertifikat</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL HAPUS -->
+<div class="modal-overlay" id="modalHapusSert">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title" style="color:#DC2626"><i class="fas fa-exclamation-triangle" style="margin-right:8px"></i>Konfirmasi Hapus</div>
+      <button class="modal-close" onclick="closeModal('modalHapusSert')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom:8px;font-size:15px">Hapus sertifikat untuk <strong id="hapusSertNama"></strong>?</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px">Tindakan ini tidak dapat dibatalkan.</p>
+      <form method="POST" id="formHapusSert">
+        <div style="display:flex;gap:12px">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalHapusSert')" style="flex:1">Batal</button>
+          <button type="submit" class="btn btn-danger" style="flex:1;background:#EF4444;color:white"><i class="fas fa-trash"></i> Hapus</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+// Set status labels
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().slice(0,10);
+  document.querySelectorAll('[data-tgl]').forEach(el => {
+    const tgl = el.dataset.tgl;
+    if (tgl >= today) {
+      el.className = 'sert-status aktif';
+      el.innerHTML = '<i class="fas fa-check-circle"></i> Aktif';
+    } else {
+      el.className = 'sert-status expired';
+      el.innerHTML = '<i class="fas fa-times-circle"></i> Kadaluarsa';
+    }
+  });
+
+  // Drag and drop for upload zones
+  document.querySelectorAll('.upload-zone').forEach(zone => {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('dragover');
+      const input = zone.nextElementSibling;
+      if (e.dataTransfer.files.length && input) {
+        input.files = e.dataTransfer.files;
+        input.dispatchEvent(new Event('change'));
+      }
+    });
+  });
+});
+
+// Search
+document.getElementById('searchInput').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  let shown = 0;
+  document.querySelectorAll('#tableBody tr').forEach((tr, i) => {
+    const match = (tr.dataset.search || '').includes(q);
+    tr.style.display = match ? '' : 'none';
+    if (match) { shown++; tr.querySelector('.td-no').textContent = shown; }
+  });
+});
+
+// File preview
+function previewFile(input, previewId, zoneId) {
+  const preview = document.getElementById(previewId);
+  const zone = document.getElementById(zoneId);
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+    const icon = file.type === 'application/pdf' ? 'fa-file-pdf' : 'fa-file-image';
+    preview.innerHTML = `
+      <div class="file-chip">
+        <i class="fas ${icon}"></i>
+        <span>${file.name} (${sizeMB} MB)</span>
+      </div>`;
+    zone.style.borderColor = 'var(--gold)';
+    zone.style.background = 'rgba(200,168,75,0.04)';
+  }
+}
+
+function openEditSert(id, prodiId, akreditasi, tglTerbit, tglBerakhir, fileName) {
+  document.getElementById('editProdiId').value    = prodiId;
+  document.getElementById('editAkreditasi').value = akreditasi;
+  document.getElementById('editTglTerbit').value  = tglTerbit;
+  document.getElementById('editTglBerakhir').value= tglBerakhir;
+  document.getElementById('formEditSert').action  = `/admin/sertifikat/edit/${id}`;
+  // Reset file preview
+  document.getElementById('previewEdit').innerHTML = '';
+  document.getElementById('fileEdit').value = '';
+  // Show current file indicator
+  const currentFileDiv = document.getElementById('editCurrentFile');
+  if (fileName) {
+    currentFileDiv.style.display = 'flex';
+    document.getElementById('editCurrentFileName').textContent = fileName;
+    document.getElementById('editCurrentFileLink').href = `/file/${id}`;
+  } else {
+    currentFileDiv.style.display = 'none';
+  }
+  openModal('modalEditSert');
+}
+
+function konfirmasiHapusSert(id, nama) {
+  document.getElementById('hapusSertNama').textContent = nama;
+  document.getElementById('formHapusSert').action = `/admin/sertifikat/delete/${id}`;
+  openModal('modalHapusSert');
+}
+
+// Validasi file wajib sebelum submit tambah
+document.querySelector('#modalTambahSert form').addEventListener('submit', function(e) {
+  const fileInput = document.getElementById('fileTambah');
+  const errEl     = document.getElementById('fileError');
+  if (!fileInput.files || fileInput.files.length === 0) {
+    e.preventDefault();
+    errEl.style.display = 'block';
+    document.getElementById('uploadZoneTambah').style.borderColor = '#EF4444';
+    document.getElementById('uploadZoneTambah').style.background  = '#FEF2F2';
+    fileInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return false;
+  }
+  errEl.style.display = 'none';
+});
+
+// Hilangkan border merah saat file dipilih
+document.getElementById('fileTambah').addEventListener('change', function() {
+  if (this.files && this.files.length > 0) {
+    document.getElementById('fileError').style.display = 'none';
+    document.getElementById('uploadZoneTambah').style.borderColor = 'var(--gold)';
+    document.getElementById('uploadZoneTambah').style.background  = 'rgba(200,168,75,0.04)';
+  }
+});
+// Auto-buka modal tambah jika ada error dari backend
+{% if open_tambah %}
+document.addEventListener('DOMContentLoaded', () => openModal('modalTambahSert'));
+{% endif %}
+</script>
+{% endblock %}

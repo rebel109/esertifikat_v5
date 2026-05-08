@@ -1,0 +1,490 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+.admin-navbar-extra {
+  background: linear-gradient(135deg, #0D4F3C, #0a3a2c);
+  padding: 10px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: none;
+}
+
+.admin-topbar {
+  background: linear-gradient(135deg, #0D4F3C 0%, #0D1B2A 100%);
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(200,168,75,0.2);
+}
+
+.admin-topbar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-title {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-title i { color: var(--gold); }
+
+.admin-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.admin-nav a {
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-nav a:hover, .admin-nav a.active {
+  background: rgba(200,168,75,0.15);
+  color: var(--gold-light);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  border: 1px solid rgba(200,168,75,0.1);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  transition: all 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+}
+
+.stat-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.stat-icon.gold { background: rgba(200,168,75,0.12); color: var(--gold-dark); }
+.stat-icon.navy { background: rgba(27,45,69,0.1); color: var(--navy); }
+.stat-icon.green { background: rgba(22,163,74,0.1); color: #16A34A; }
+
+.stat-card-num {
+  font-family: 'Cinzel', serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1;
+}
+
+.stat-card-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* AKREDITASI SECTIONS */
+.akreditasi-sections {
+  margin-bottom: 40px;
+}
+
+.akreditasi-section {
+  margin-bottom: 32px;
+}
+
+.akreditasi-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.akreditasi-title i {
+  font-size: 20px;
+}
+
+.akreditasi-title::after {
+  display: none;
+}
+
+.akr-unggul { color: #FFD700; }
+.akr-baik-sekali { color: #FF6B35; }
+.akr-baik { color: #4CAF50; }
+.akr-a { color: #2196F3; }
+.akr-b { color: #FF9800; }
+.akr-c { color: #F44336; }
+
+.section-count {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.badge-jenjang {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-s1 { background: rgba(33,150,243,0.1); color: #2196F3; }
+.badge-s2 { background: rgba(76,175,80,0.1); color: #4CAF50; }
+.badge-s3 { background: rgba(255,152,0,0.1); color: #FF9800; }
+.badge-d3 { background: rgba(156,39,176,0.1); color: #9C27B0; }
+.badge-d4 { background: rgba(244,67,54,0.1); color: #F44336; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ADMIN TOPBAR -->
+<div class="admin-topbar">
+  <div class="admin-topbar-inner">
+    <div class="admin-title">
+      <i class="fas fa-tachometer-alt"></i>
+      Dashboard Administrator
+    </div>
+    <div class="admin-nav">
+      <a href="/admin" class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+        <i class="fas fa-home"></i> Dashboard
+      </a>
+      <a href="/admin/warnings" style="color:#F59E0B">
+        <i class="fas fa-exclamation-triangle"></i> Peringatan
+      </a>
+      <a href="/admin/prodi" class="{% if request.endpoint == 'admin_prodi' %}active{% endif %}">
+        <i class="fas fa-graduation-cap"></i> Program Studi
+      </a>
+      <a href="/admin/sertifikat" class="{% if request.endpoint == 'admin_sertifikat' %}active{% endif %}">
+        <i class="fas fa-certificate"></i> Sertifikat
+      </a>
+      <a href="/admin/pengaturan"><i class="fas fa-cog"></i> Pengaturan</a>
+      <a href="/admin/logout" style="color:#FCA5A5">
+        <i class="fas fa-sign-out-alt"></i> Keluar
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon navy"><i class="fas fa-graduation-cap"></i></div>
+      <div>
+        <div class="stat-card-num">{{ total_prodi }}</div>
+        <div class="stat-card-label">Program Studi</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon gold"><i class="fas fa-certificate"></i></div>
+      <div>
+        <div class="stat-card-num">{{ total_sertifikat }}</div>
+        <div class="stat-card-label">Total Sertifikat</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+      <div>
+        <div class="stat-card-num">{{ aktif }}</div>
+        <div class="stat-card-label">Sertifikat Aktif</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(220,38,38,0.1);color:#DC2626"><i class="fas fa-exclamation-triangle"></i></div>
+      <div>
+        <div class="stat-card-num">{{ total_sertifikat - aktif }}</div>
+        <div class="stat-card-label">Sertifikat Kadaluarsa</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AKREDITASI SECTIONS -->
+  <div class="akreditasi-sections">
+
+    <!-- UNGGUL -->
+    {% if unggul %}
+    <div class="akreditasi-section">
+      <div class="section-header">
+        <div class="section-title akreditasi-title akr-unggul">
+          <i class="fas fa-star"></i> Akreditasi Unggul
+        </div>
+        <div class="section-count">{{ unggul|length }} Program Studi</div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Program Studi</th>
+                <th>Fakultas</th>
+                <th>Jenjang</th>
+                <th>Tgl Terbit</th>
+                <th>Tgl Berakhir</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in unggul %}
+              <tr>
+                <td class="td-prodi">{{ s.nama }}</td>
+                <td class="td-fakultas">{{ s.fakultas }}</td>
+                <td><span class="badge-jenjang badge-{{ s.jenjang.lower() }}">{{ s.jenjang }}</span></td>
+                <td class="td-date">{{ s.tgl_terbit }}</td>
+                <td class="td-date">{{ s.tgl_berakhir }}</td>
+                <td><span class="sert-status {% if s.tgl_berakhir >= '2024-01-01' %}aktif{% else %}expired{% endif %}">{% if s.tgl_berakhir >= '2024-01-01' %}Aktif{% else %}Kadaluarsa{% endif %}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- BAIK SEKALI -->
+    {% if baik_sekali %}
+    <div class="akreditasi-section">
+      <div class="section-header">
+        <div class="section-title akreditasi-title akr-baik-sekali">
+          <i class="fas fa-trophy"></i> Akreditasi Baik Sekali
+        </div>
+        <div class="section-count">{{ baik_sekali|length }} Program Studi</div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Program Studi</th>
+                <th>Fakultas</th>
+                <th>Jenjang</th>
+                <th>Tgl Terbit</th>
+                <th>Tgl Berakhir</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in baik_sekali %}
+              <tr>
+                <td class="td-prodi">{{ s.nama }}</td>
+                <td class="td-fakultas">{{ s.fakultas }}</td>
+                <td><span class="badge-jenjang badge-{{ s.jenjang.lower() }}">{{ s.jenjang }}</span></td>
+                <td class="td-date">{{ s.tgl_terbit }}</td>
+                <td class="td-date">{{ s.tgl_berakhir }}</td>
+                <td><span class="sert-status {% if s.tgl_berakhir >= '2024-01-01' %}aktif{% else %}expired{% endif %}">{% if s.tgl_berakhir >= '2024-01-01' %}Aktif{% else %}Kadaluarsa{% endif %}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- BAIK -->
+    {% if baik %}
+    <div class="akreditasi-section">
+      <div class="section-header">
+        <div class="section-title akreditasi-title akr-baik">
+          <i class="fas fa-medal"></i> Akreditasi Baik
+        </div>
+        <div class="section-count">{{ baik|length }} Program Studi</div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Program Studi</th>
+                <th>Fakultas</th>
+                <th>Jenjang</th>
+                <th>Tgl Terbit</th>
+                <th>Tgl Berakhir</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in baik %}
+              <tr>
+                <td class="td-prodi">{{ s.nama }}</td>
+                <td class="td-fakultas">{{ s.fakultas }}</td>
+                <td><span class="badge-jenjang badge-{{ s.jenjang.lower() }}">{{ s.jenjang }}</span></td>
+                <td class="td-date">{{ s.tgl_terbit }}</td>
+                <td class="td-date">{{ s.tgl_berakhir }}</td>
+                <td><span class="sert-status {% if s.tgl_berakhir >= '2024-01-01' %}aktif{% else %}expired{% endif %}">{% if s.tgl_berakhir >= '2024-01-01' %}Aktif{% else %}Kadaluarsa{% endif %}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- AKREDITASI A -->
+    {% if akreditasi_a %}
+    <div class="akreditasi-section">
+      <div class="section-header">
+        <div class="section-title akreditasi-title akr-a">
+          <i class="fas fa-award"></i> Akreditasi A
+        </div>
+        <div class="section-count">{{ akreditasi_a|length }} Program Studi</div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Program Studi</th>
+                <th>Fakultas</th>
+                <th>Jenjang</th>
+                <th>Tgl Terbit</th>
+                <th>Tgl Berakhir</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in akreditasi_a %}
+              <tr>
+                <td class="td-prodi">{{ s.nama }}</td>
+                <td class="td-fakultas">{{ s.fakultas }}</td>
+                <td><span class="badge-jenjang badge-{{ s.jenjang.lower() }}">{{ s.jenjang }}</span></td>
+                <td class="td-date">{{ s.tgl_terbit }}</td>
+                <td class="td-date">{{ s.tgl_berakhir }}</td>
+                <td><span class="sert-status {% if s.tgl_berakhir >= '2024-01-01' %}aktif{% else %}expired{% endif %}">{% if s.tgl_berakhir >= '2024-01-01' %}Aktif{% else %}Kadaluarsa{% endif %}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- AKREDITASI B -->
+    {% if akreditasi_b %}
+    <div class="akreditasi-section">
+      <div class="section-header">
+        <div class="section-title akreditasi-title akr-b">
+          <i class="fas fa-certificate"></i> Akreditasi B
+        </div>
+        <div class="section-count">{{ akreditasi_b|length }} Program Studi</div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Program Studi</th>
+                <th>Fakultas</th>
+                <th>Jenjang</th>
+                <th>Tgl Terbit</th>
+                <th>Tgl Berakhir</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in akreditasi_b %}
+              <tr>
+                <td class="td-prodi">{{ s.nama }}</td>
+                <td class="td-fakultas">{{ s.fakultas }}</td>
+                <td><span class="badge-jenjang badge-{{ s.jenjang.lower() }}">{{ s.jenjang }}</span></td>
+                <td class="td-date">{{ s.tgl_terbit }}</td>
+                <td class="td-date">{{ s.tgl_berakhir }}</td>
+                <td><span class="sert-status {% if s.tgl_berakhir >= '2024-01-01' %}aktif{% else %}expired{% endif %}">{% if s.tgl_berakhir >= '2024-01-01' %}Aktif{% else %}Kadaluarsa{% endif %}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- AKREDITASI C -->
+    {% if akreditasi_c %}
+    <div class="akreditasi-section">
+      <div class="section-header">
+        <div class="section-title akreditasi-title akr-c">
+          <i class="fas fa-exclamation-triangle"></i> Akreditasi C
+        </div>
+        <div class="section-count">{{ akreditasi_c|length }} Program Studi</div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Program Studi</th>
+                <th>Fakultas</th>
+                <th>Jenjang</th>
+                <th>Tgl Terbit</th>
+                <th>Tgl Berakhir</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in akreditasi_c %}
+              <tr>
+                <td class="td-prodi">{{ s.nama }}</td>
+                <td class="td-fakultas">{{ s.fakultas }}</td>
+                <td><span class="badge-jenjang badge-{{ s.jenjang.lower() }}">{{ s.jenjang }}</span></td>
+                <td class="td-date">{{ s.tgl_terbit }}</td>
+                <td class="td-date">{{ s.tgl_berakhir }}</td>
+                <td><span class="sert-status {% if s.tgl_berakhir >= '2024-01-01' %}aktif{% else %}expired{% endif %}">{% if s.tgl_berakhir >= '2024-01-01' %}Aktif{% else %}Kadaluarsa{% endif %}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  </div>
+
+</div>
+
+<style>
+.sert-status { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:100px; font-size:11px; font-weight:600; }
+.sert-status.aktif { background:#DCFCE7; color:#15803D; }
+.sert-status.expired { background:#FEE2E2; color:#B91C1C; }
+</style>
+
+{% endblock %}

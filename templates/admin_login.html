@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Admin — E-Sertifikat UIN Raden Fatah</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: linear-gradient(135deg, #0D1B2A 0%, #1B2D45 50%, #0D4F3C 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+body::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(200,168,75,0.08), transparent 70%);
+  top: -150px; right: -150px;
+}
+
+body::after {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(13,79,60,0.3), transparent 70%);
+  bottom: -100px; left: -100px;
+}
+
+.login-card {
+  background: white;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.4);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.login-header {
+  background: linear-gradient(135deg, #0D1B2A, #1B2D45);
+  padding: 40px 40px 32px;
+  text-align: center;
+  position: relative;
+}
+
+.login-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #C8A84B, transparent);
+}
+
+.logo-circle {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, #C8A84B, #8B6914);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  color: #0D1B2A;
+  font-size: 20px;
+  box-shadow: 0 8px 24px rgba(200,168,75,0.4);
+}
+
+.login-header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  color: white;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.login-header p {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.login-body {
+  padding: 36px 40px 40px;
+}
+
+.admin-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFF7ED;
+  border: 1.5px solid #FED7AA;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 28px;
+}
+
+.admin-badge i { color: #C2410C; }
+
+.admin-badge span {
+  font-size: 12px;
+  color: #92400E;
+  font-weight: 500;
+}
+
+.form-group { margin-bottom: 20px; }
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6B5A4E;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.input-wrap { position: relative; }
+
+.input-wrap i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9CA3AF;
+  font-size: 14px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border: 1.5px solid #EDE7DB;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: #2C1810;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.form-control:focus {
+  border-color: #C8A84B;
+  box-shadow: 0 0 0 3px rgba(200,168,75,0.1);
+}
+
+.error-msg {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: #B91C1C;
+  font-size: 13px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-login {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, #C8A84B, #8B6914);
+  color: #0D1B2A;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(200,168,75,0.3);
+}
+
+.btn-login:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(200,168,75,0.4);
+}
+
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: #9CA3AF;
+  text-decoration: none;
+}
+
+.back-link:hover { color: #C8A84B; }
+
+.demo-info {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-top: 20px;
+  font-size: 12px;
+  color: #166534;
+}
+
+.demo-info strong { display: block; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="login-card">
+  <div class="login-header">
+    <div class="logo-circle">UIN</div>
+    <h1>Portal Admin</h1>
+    <p>E-Sertifikat Akreditasi</p>
+  </div>
+  <div class="login-body">
+    <div class="admin-badge">
+      <i class="fas fa-shield-alt"></i>
+      <span>Area terbatas — hanya untuk admin</span>
+    </div>
+
+    {% if pw_changed %}
+    <div class="error-msg" style="background:#F0FDF4;border-color:#BBF7D0;color:#15803D">
+      <i class="fas fa-check-circle"></i> Password berhasil diubah. Silakan login dengan password baru.
+    </div>
+    {% endif %}
+
+    {% if timeout %}
+    <div class="error-msg" style="background:#FFF7ED;border-color:#FED7AA;color:#C2410C">
+      <i class="fas fa-clock"></i> Sesi berakhir karena tidak aktif selama {{ timeout_menit }} menit. Silakan login kembali.
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="error-msg">
+      <i class="fas fa-exclamation-circle"></i> {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST">
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <div class="input-wrap">
+          <i class="fas fa-user"></i>
+          <input type="text" name="username" class="form-control" placeholder="Masukkan username" required autofocus>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <i class="fas fa-lock"></i>
+          <input type="password" name="password" class="form-control" placeholder="Masukkan password" required>
+        </div>
+      </div>
+      <button type="submit" class="btn-login">
+        <i class="fas fa-sign-in-alt" style="margin-right:8px"></i>
+        Masuk ke Dashboard
+      </button>
+    </form>
+
+    <div class="demo-info">
+      <strong><i class="fas fa-info-circle"></i> Attention:</strong>
+      Hanya Admin yang bisa login kedalam aplikasi !
+    </div>
+
+    <a href="/" class="back-link">
+      <i class="fas fa-arrow-left" style="margin-right:4px"></i> Kembali ke Halaman Publik
+    </a>
+  </div>
+</div>
+</body>
+</html>

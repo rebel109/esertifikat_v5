@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+.admin-topbar {
+  background: linear-gradient(135deg, #0D4F3C 0%, #0D1B2A 100%);
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(200,168,75,0.2);
+}
+.admin-topbar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.admin-title { font-family:'Cinzel',serif; font-size:13px; color:rgba(255,255,255,0.7); display:flex; align-items:center; gap:8px; }
+.admin-title i { color:var(--gold); }
+.admin-nav { display:flex; gap:4px; }
+.admin-nav a { color:rgba(255,255,255,0.65); text-decoration:none; padding:7px 16px; border-radius:6px; font-size:13px; font-weight:500; transition:all 0.2s; display:flex; align-items:center; gap:6px; }
+.admin-nav a:hover, .admin-nav a.active { background:rgba(200,168,75,0.15); color:var(--gold-light); }
+.sert-status { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:100px; font-size:11px; font-weight:600; }
+.sert-status.aktif { background:#DCFCE7; color:#15803D; }
+.sert-status.expired { background:#FEE2E2; color:#B91C1C; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-topbar">
+  <div class="admin-topbar-inner">
+    <div class="admin-title"><i class="fas fa-graduation-cap"></i> Manajemen Program Studi</div>
+    <div class="admin-nav">
+      <a href="/admin"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="/admin/warnings" style="color:#F59E0B"><i class="fas fa-exclamation-triangle"></i> Peringatan</a>
+      <a href="/admin/prodi" class="active"><i class="fas fa-graduation-cap"></i> Program Studi</a>
+      <a href="/admin/sertifikat"><i class="fas fa-certificate"></i> Sertifikat</a>
+      <a href="/admin/pengaturan"><i class="fas fa-cog"></i> Pengaturan</a>
+      <a href="/admin/logout" style="color:#FCA5A5"><i class="fas fa-sign-out-alt"></i> Keluar</a>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="section-header">
+    <div class="section-title">Data Program Studi</div>
+    <button class="btn btn-gold" onclick="openModal('modalTambahProdi')">
+      <i class="fas fa-plus"></i> Tambah Program Studi
+    </button>
+  </div>
+
+  <div class="table-card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Program Studi</th>
+            <th>Fakultas</th>
+            <th>Jenjang</th>
+            <th>Jumlah Sertifikat</th>
+            <th style="text-align:center">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in data %}
+          <tr>
+            <td class="td-no">{{ loop.index }}</td>
+            <td class="td-prodi">{{ row.nama }}</td>
+            <td class="td-fakultas">{{ row.fakultas }}</td>
+            <td>
+              <span class="badge-jenjang badge-{{ row.jenjang.lower() }}">{{ row.jenjang }}</span>
+            </td>
+            <td>
+              <span style="font-weight:600;color:var(--navy)">{{ row.jml_sertifikat }}</span>
+              <span style="font-size:12px;color:var(--muted)"> sertifikat</span>
+            </td>
+            <td>
+              <div class="action-buttons" style="justify-content:center">
+                <button class="btn btn-outline btn-sm"
+                  onclick="openEditProdi({{ row.id }}, '{{ row.nama|replace("'", "\\'") }}', '{{ row.fakultas|replace("'", "\\'") }}', '{{ row.jenjang }}')">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="konfirmasiHapusProdi({{ row.id }}, '{{ row.nama|replace("'", "\\'") }}')">
+                  <i class="fas fa-trash"></i> Hapus
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="table-footer">
+      <span>Total: <strong>{{ data|length }}</strong> program studi</span>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TAMBAH -->
+<div class="modal-overlay" id="modalTambahProdi">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-plus-circle" style="color:var(--gold);margin-right:8px"></i>Tambah Program Studi</div>
+      <button class="modal-close" onclick="closeModal('modalTambahProdi')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <form method="POST" action="/admin/prodi/add">
+        <div class="form-group">
+          <label class="form-label">Nama Program Studi</label>
+          <input type="text" name="nama" class="form-control" placeholder="cth: Sistem Informasi" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fakultas</label>
+          <select name="fakultas" class="form-control" required>
+            <option value="">— Pilih Fakultas —</option>
+            <option value="Fakultas Sains dan Teknologi">Fakultas Sains dan Teknologi</option>
+            <option value="Fakultas Ilmu Sosial dan Ilmu Politik">Fakultas Ilmu Sosial dan Ilmu Politik</option>
+            <option value="Fakultas Ushuluddin dan Pemikiran Islam">Fakultas Ushuluddin dan Pemikiran Islam</option>
+            <option value="Fakultas Tarbiyah dan Keguruan">Fakultas Tarbiyah dan Keguruan</option>
+            <option value="Fakultas Syariah dan Hukum">Fakultas Syariah dan Hukum</option>
+            <option value="Fakultas Ekonomi dan Bisnis Islam">Fakultas Ekonomi dan Bisnis Islam</option>
+            <option value="Fakultas Dakwah dan Komunikasi">Fakultas Dakwah dan Komunikasi</option>
+            <option value="Fakultas Adab dan Humaniora">Fakultas Adab dan Humaniora</option>
+            <option value="Fakultas Psikologi">Fakultas Psikologi</option>
+            <option value="Pascasarjana">Pascasarjana</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jenjang</label>
+          <select name="jenjang" class="form-control" required>
+            <option value="">— Pilih Jenjang —</option>
+            <option value="D3">D3 (Diploma)</option>
+            <option value="S1">S1 (Sarjana)</option>
+            <option value="S2">S2 (Magister)</option>
+            <option value="S3">S3 (Doktor)</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalTambahProdi')" style="flex:1">Batal</button>
+          <button type="submit" class="btn btn-gold" style="flex:2"><i class="fas fa-save"></i> Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDIT -->
+<div class="modal-overlay" id="modalEditProdi">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-edit" style="color:var(--gold);margin-right:8px"></i>Edit Program Studi</div>
+      <button class="modal-close" onclick="closeModal('modalEditProdi')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <form method="POST" id="formEditProdi">
+        <div class="form-group">
+          <label class="form-label">Nama Program Studi</label>
+          <input type="text" name="nama" id="editNama" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fakultas</label>
+          <select name="fakultas" id="editFakultas" class="form-control" required>
+            <option value="Fakultas Sains dan Teknologi">Fakultas Sains dan Teknologi</option>
+            <option value="Fakultas Tarbiyah dan Keguruan">Fakultas Tarbiyah dan Keguruan</option>
+            <option value="Fakultas Syariah dan Hukum">Fakultas Syariah dan Hukum</option>
+            <option value="Fakultas Ekonomi dan Bisnis Islam">Fakultas Ekonomi dan Bisnis Islam</option>
+            <option value="Fakultas Dakwah dan Komunikasi">Fakultas Dakwah dan Komunikasi</option>
+            <option value="Fakultas Adab dan Humaniora">Fakultas Adab dan Humaniora</option>
+            <option value="Fakultas Psikologi">Fakultas Psikologi</option>
+            <option value="Pascasarjana">Pascasarjana</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jenjang</label>
+          <select name="jenjang" id="editJenjang" class="form-control" required>
+            <option value="D3">D3 (Diploma)</option>
+            <option value="S1">S1 (Sarjana)</option>
+            <option value="S2">S2 (Magister)</option>
+            <option value="S3">S3 (Doktor)</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalEditProdi')" style="flex:1">Batal</button>
+          <button type="submit" class="btn btn-gold" style="flex:2"><i class="fas fa-save"></i> Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL HAPUS -->
+<div class="modal-overlay" id="modalHapusProdi">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title" style="color:#DC2626"><i class="fas fa-exclamation-triangle" style="margin-right:8px"></i>Konfirmasi Hapus</div>
+      <button class="modal-close" onclick="closeModal('modalHapusProdi')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom:8px;font-size:15px">Hapus program studi <strong id="hapusProdiNama"></strong>?</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px">Semua sertifikat terkait program studi ini juga akan dihapus. Tindakan ini tidak dapat dibatalkan.</p>
+      <form method="POST" id="formHapusProdi">
+        <div style="display:flex;gap:12px">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalHapusProdi')" style="flex:1">Batal</button>
+          <button type="submit" class="btn btn-danger" style="flex:1;background:#EF4444;color:white"><i class="fas fa-trash"></i> Hapus</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function openEditProdi(id, nama, fakultas, jenjang) {
+  document.getElementById('editNama').value = nama;
+  document.getElementById('editFakultas').value = fakultas;
+  document.getElementById('editJenjang').value = jenjang;
+  document.getElementById('formEditProdi').action = `/admin/prodi/edit/${id}`;
+  openModal('modalEditProdi');
+}
+
+function konfirmasiHapusProdi(id, nama) {
+  document.getElementById('hapusProdiNama').textContent = nama;
+  document.getElementById('formHapusProdi').action = `/admin/prodi/delete/${id}`;
+  openModal('modalHapusProdi');
+}
+</script>
+{% endblock %}

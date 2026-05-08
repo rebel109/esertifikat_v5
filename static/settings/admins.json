@@ -1,0 +1,26 @@
+[
+  {
+    "username": "radio109",
+    "password": "298ab9c88940dde8b233ce86a4e8c7daa6616452916168e8844790bde33e19c7",
+    "nama": "Muhammad Fadhil",
+    "role": "superadmin"
+  },
+  {
+    "username": "dadang",
+    "password": "e75bb9f643145c971642df986d2026530e3accac2522a2fb27c8fdf1d8cac29c",
+    "nama": "Dadang Fauzi",
+    "role": "admin"
+  },
+  {
+    "username": "seraga",
+    "password": "f893e10574a4d1958a274a54e1f960cf8ea29c39f503d06ae9aa6b1bb058e6a3",
+    "nama": "Seraga Santri",
+    "role": "admin"
+  },
+  {
+    "username": "ulyl",
+    "password": "3dbf67ad28366de48b1a462be1e9d76de9f8344884795b13d4214aa610dd4b01",
+    "nama": "Ulyl Absor",
+    "role": "admin"
+  }
+]

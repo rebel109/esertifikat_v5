@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}E-Sertifikat Akreditasi — UIN Raden Fatah Palembang{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+:root {
+  --gold: #C8A84B;
+  --gold-light: #E8C96A;
+  --gold-dark: #8B6914;
+  --deep: #0D1B2A;
+  --navy: #1B2D45;
+  --navy-light: #243D5C;
+  --emerald: #0D4F3C;
+  --cream: #F7F3EC;
+  --cream-dark: #EDE7DB;
+  --text: #2C1810;
+  --muted: #6B5A4E;
+  --white: #FFFFFF;
+  --shadow: 0 8px 40px rgba(13,27,42,0.15);
+  --shadow-gold: 0 4px 20px rgba(200,168,75,0.3);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* NAVBAR */
+.navbar {
+  background: linear-gradient(135deg, var(--deep) 0%, var(--navy) 60%, var(--emerald) 100%);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+
+.navbar::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.nav-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 72px;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+}
+
+.nav-logo {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  color: var(--deep);
+  font-size: 15px;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-gold);
+}
+
+.nav-title {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: var(--white);
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+}
+
+.nav-title small {
+  display: block;
+  font-size: 10px;
+  color: var(--gold-light);
+  letter-spacing: 1.5px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+}
+
+.nav-links {
+  display: flex;
+  gap: 4px;
+}
+
+.nav-link {
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: all 0.2s;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--gold-light);
+  background: rgba(200,168,75,0.12);
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(160deg, var(--deep) 0%, var(--navy) 50%, var(--emerald) 100%);
+  padding: 72px 32px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(200,168,75,0.08) 0%, transparent 70%);
+  top: -200px; right: -100px;
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(13,79,60,0.3) 0%, transparent 70%);
+  bottom: -100px; left: -100px;
+  pointer-events: none;
+}
+
+.hero-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(200,168,75,0.15);
+  border: 1px solid rgba(200,168,75,0.3);
+  color: var(--gold-light);
+  padding: 6px 18px;
+  border-radius: 100px;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.hero h1 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(24px, 4vw, 42px);
+  color: var(--white);
+  line-height: 1.2;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.hero h1 span {
+  color: var(--gold-light);
+}
+
+.hero-sub {
+  font-family: 'Lora', serif;
+  font-size: 16px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 48px;
+  font-style: italic;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-num {
+  font-family: 'Cinzel', serif;
+  font-size: 36px;
+  color: var(--gold-light);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* GOLD DIVIDER */
+.gold-divider {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 0;
+}
+
+/* MAIN CONTENT */
+.main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 48px 32px;
+}
+
+/* SECTION HEADER */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  color: var(--navy);
+  font-weight: 600;
+}
+
+.section-title::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: var(--gold);
+  margin-top: 8px;
+  border-radius: 2px;
+}
+
+/* SEARCH BAR */
+.search-wrap {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.search-input {
+  padding: 10px 16px 10px 40px;
+  border: 1.5px solid var(--cream-dark);
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 280px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.search-input:focus { border-color: var(--gold); }
+
+.search-wrap-inner {
+  position: relative;
+}
+
+.search-wrap-inner i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.filter-select {
+  padding: 10px 14px;
+  border: 1.5px solid var(--cream-dark);
+  border-radius: 8px;
+  font-size: 13px;
+  background: white;
+  outline: none;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+}
+
+.filter-select:focus { border-color: var(--gold); }
+
+/* TABLE */
+.table-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  border: 1px solid rgba(200,168,75,0.15);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--deep) 100%);
+}
+
+thead th {
+  padding: 16px 20px;
+  text-align: left;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+tbody tr {
+  border-bottom: 1px solid rgba(200,168,75,0.08);
+  transition: background 0.15s;
+}
+
+tbody tr:hover { background: rgba(200,168,75,0.04); }
+tbody tr:last-child { border-bottom: none; }
+
+tbody td {
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.td-no {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+  width: 50px;
+}
+
+.td-prodi {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--navy);
+}
+
+.td-fakultas {
+  font-size: 12px;
+  color: var(--muted);
+  max-width: 180px;
+}
+
+.badge-jenjang {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.badge-s1 { background: #EEF2FF; color: #4338CA; }
+.badge-s2 { background: #F0FDF4; color: #166534; }
+.badge-s3 { background: #FEF9C3; color: #854D0E; }
+.badge-d3 { background: #FFF1F2; color: #9F1239; }
+
+.badge-akreditasi {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.akr-unggul { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+.akr-a { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+.akr-b { background: #FFF7ED; color: #C2410C; border: 1px solid #FED7AA; }
+.akr-c { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
+.akr-baik { background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; }
+
+.td-date {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.td-date.expired {
+  color: #DC2626;
+}
+
+.td-date.active {
+  color: #16A34A;
+}
+
+/* BUTTONS */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: var(--deep);
+  box-shadow: 0 2px 8px rgba(200,168,75,0.3);
+}
+
+.btn-gold:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(200,168,75,0.4);
+}
+
+.btn-navy {
+  background: var(--navy);
+  color: white;
+}
+
+.btn-navy:hover {
+  background: var(--deep);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--gold);
+  color: var(--gold-dark);
+}
+
+.btn-outline:hover {
+  background: var(--gold);
+  color: var(--deep);
+}
+
+.btn-danger {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+.btn-danger:hover { background: #FCA5A5; }
+
+.btn-success {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.btn-success:hover { background: #BBF7D0; }
+
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+.btn-lg { padding: 12px 28px; font-size: 15px; }
+
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(13,27,42,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.active {
+  display: flex;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.modal {
+  background: white;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+  animation: slideUp 0.25s ease;
+}
+
+.modal-header {
+  padding: 28px 32px 20px;
+  border-bottom: 1px solid var(--cream-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title {
+  font-family: 'Cinzel', serif;
+  font-size: 17px;
+  color: var(--navy);
+  font-weight: 600;
+}
+
+.modal-close {
+  width: 32px; height: 32px;
+  border: none;
+  background: var(--cream);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 16px;
+  transition: all 0.15s;
+}
+
+.modal-close:hover { background: var(--cream-dark); color: var(--text); }
+
+.modal-body { padding: 24px 32px 32px; }
+
+/* FORMS */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--cream-dark);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  background: white;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(200,168,75,0.1);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* TOAST */
+.toast-wrap {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  background: var(--navy);
+  color: white;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow);
+  animation: slideIn 0.3s ease;
+  min-width: 280px;
+}
+
+.toast.success { border-left: 4px solid #22C55E; }
+.toast.error { border-left: 4px solid #EF4444; }
+
+@keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
+
+/* PAGINATION/TABLE FOOTER */
+.table-footer {
+  padding: 16px 24px;
+  background: var(--cream);
+  border-top: 1px solid var(--cream-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--muted);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* BREADCRUMB */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.breadcrumb a {
+  color: var(--gold-dark);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb-sep { color: rgba(0,0,0,0.2); }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .hero-stats { gap: 32px; }
+  .main { padding: 32px 16px; }
+  .form-row { grid-template-columns: 1fr; }
+  .section-header { flex-direction: column; align-items: flex-start; }
+  .search-wrap { flex-direction: column; align-items: stretch; }
+  .search-input { width: 100%; }
+  .modal-header, .modal-body { padding-left: 20px; padding-right: 20px; }
+}
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 64px 32px;
+  color: var(--muted);
+}
+
+.empty-state i {
+  font-size: 48px;
+  color: var(--cream-dark);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.empty-state h3 {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  font-size: 14px;
+}
+
+/* SCROLL */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--cream-dark); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+</style>
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      {% set _logo = get_setting('logo') %}
+      {% if _logo %}
+        <img src="/static/settings/{{ _logo }}" alt="Logo"
+             style="height:46px;width:46px;object-fit:contain;border-radius:50%;background:white;padding:3px;box-shadow:0 0 0 2px var(--gold);">
+      {% else %}
+        <div class="nav-logo">UIN</div>
+      {% endif %}
+      <div class="nav-title">
+        E-Sertifikat Akreditasi
+        <small>UIN RADEN FATAH PALEMBANG</small>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">
+        <i class="fas fa-home"></i> Beranda
+      </a>
+      {% if session.get('admin') %}
+      <a href="/admin" class="nav-link">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
+      <div class="nav-link" style="cursor:default;opacity:0.8" id="navCountdown" title="Sesi akan berakhir jika tidak aktif"></div>
+      <a href="/admin/logout" class="nav-link" style="color:#FCA5A5">
+        <i class="fas fa-sign-out-alt"></i> Keluar
+      </a>
+      {% else %}
+      <a href="/admin" class="nav-link">
+        <i class="fas fa-lock"></i> Admin
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+{% block content %}{% endblock %}
+
+<script>
+function showToast(msg, type='success') {
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
+  wrap.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if(e.target === m) closeModal(m.id); });
+});
+</script>
+
+{% block extra_js %}{% endblock %}
+
+{% if session.get('admin') %}
+<script>
+// Session countdown timer — auto logout setelah {{ timeout_menit|default(3) }} menit tidak aktif
+(function() {
+  const TIMEOUT_MS = {{ timeout_menit|default(3) }} * 60 * 1000;
+  let remaining   = TIMEOUT_MS;
+  let lastReset   = Date.now();
+
+  // Reset timer setiap ada aktivitas mouse/keyboard
+  ['mousemove','mousedown','keydown','scroll','touchstart','click'].forEach(ev => {
+    document.addEventListener(ev, () => {
+      remaining = TIMEOUT_MS;
+      lastReset = Date.now();
+    }, { passive: true });
+  });
+
+  function updateDisplay() {
+    const el = document.getElementById('navCountdown');
+    if (!el) return;
+    const elapsed = Date.now() - lastReset;
+    const left    = Math.max(0, TIMEOUT_MS - elapsed);
+    const mins    = Math.floor(left / 60000);
+    const secs    = Math.floor((left % 60000) / 1000);
+    const str     = `${mins}:${secs.toString().padStart(2,'0')}`;
+
+    if (left <= 30000) {
+      el.innerHTML = `<i class="fas fa-clock" style="color:#FCA5A5"></i> <span style="color:#FCA5A5;font-size:12px">${str}</span>`;
+    } else if (left <= 60000) {
+      el.innerHTML = `<i class="fas fa-clock" style="color:#FCD34D"></i> <span style="color:#FCD34D;font-size:12px">${str}</span>`;
+    } else {
+      el.innerHTML = `<i class="fas fa-clock" style="color:rgba(255,255,255,0.4)"></i> <span style="color:rgba(255,255,255,0.4);font-size:12px">${str}</span>`;
+    }
+
+    if (left <= 0) {
+      window.location.href = '/admin/logout';
+    }
+  }
+
+  setInterval(updateDisplay, 1000);
+  updateDisplay();
+})();
+</script>
+{% endif %}
+</body>
+</html>
