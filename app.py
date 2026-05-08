@@ -656,5 +656,8 @@ h2{{font-family:'Cinzel',serif;font-size:11px;color:#666;letter-spacing:2px;marg
 </div></body></html>"""
 
 
+import os
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
